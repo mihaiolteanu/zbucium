@@ -21,7 +21,7 @@
   '((:artist.getinfo      (artist)       "bio summary")
     (:artist.getsimilar   (artist limit) "artist name")
     (:artist.gettoptags   (artist)       "tag name")
-    (:artist.gettopalbums (artist limit) "album name")
+    (:artist.gettopalbums (artist limit) "album > name")
     (:artist.gettoptracks (artist limit) "track > name")
     (:artist.search       (artist limit) "artist name")
     (:album.getinfo       (artist album) "track > name")
