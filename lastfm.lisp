@@ -58,7 +58,18 @@
       (let* ((request (request-url service param-values))
              ;; Tell plump to parse the request as an xml
              (*tag-dispatchers* *xml-tags*)
-             (parsed (parse request))
-             (query (query-string service)))
-        ($ parsed query (text))))))
+             (query (query-string service))
+             (result ($ (inline (parse request))
+                       query (text))))
+        ;; For top tracks, for example, the result vector contains
+        ;; the artist name in its first half and the song name in its second
+        (if (multi-query-p service)
+            (let ((len (length result)))
+              (map 'vector (lambda (p1 p2)
+                             (concatenate 'string
+                                          p1 " - " p2))
+                   (subseq result 0 (/ len 2))
+                   (subseq result (/ len 2) len)))
+            result)
+        ))))
 
