@@ -18,15 +18,16 @@
 
 (defparameter *base-url* "http://ws.audioscrobbler.com/2.0/")
 (defparameter *services*  
-  '((:artist.getinfo       (artist)       "bio summary")
-    (:artist.getsimilar    (artist limit) "artist name")
-    (:artist.gettoptags    (artist)       "tag name")
-    (:artist.gettopalbums  (artist limit) "album name")
-    (:artist.gettoptracks  (artist limit) "track > name")
-    (:artist.search        (artist limit) "artist name")
-    (:album.getinfo        (artist album))
-    (:tag.gettoptracks     (tag limit))
-    (:tag.gettopartists    (tag limit)    "artist name"))
+  '((:artist.getinfo      (artist)       "bio summary")
+    (:artist.getsimilar   (artist limit) "artist name")
+    (:artist.gettoptags   (artist)       "tag name")
+    (:artist.gettopalbums (artist limit) "album name")
+    (:artist.gettoptracks (artist limit) "track > name")
+    (:artist.search       (artist limit) "artist name")
+    (:album.getinfo       (artist album) "track > name")
+    (:tag.gettoptracks    (tag limit)    "artist > name, track > name")
+    (:tag.gettopartists   (tag limit)    "artist name")
+    (:user.getlovedtracks (user limit)   "artist > name, track > name"))
 
   "List of all the Web Services supported by the Last.Fm API (see
   https://www.last.fm/api):
