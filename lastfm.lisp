@@ -1,69 +1,64 @@
-(ql:quickload :dexador)
+(ql:quickload :drakma)
 (ql:quickload :plump)
 (ql:quickload :lquery)
+
+(defpackage :lastfm
+  (:use :cl :drakma :plump :lquery))
+
+(in-package :lastfm)
 
 (defmacro credentials (&rest entries)
   (dolist (entry entries)
     (ccase (first entry)
-      (api-key (defparameter *api-key* (second entry)))
+      (api-key       (defparameter *api-key* (second entry)))
       (shared-secret (defparameter *shared-secret* (second entry))) 
-      (username (defparameter *username* (second entry))))))
+      (username      (defparameter *username* (second entry))))))
 
 (load #P"~/.config/.lastfm.lisp")
 
-(defparameter *base-url*
-  (format nil "http://ws.audioscrobbler.com/2.0/?api_key=~a" *api-key*))
-
-(defparameter *methods*
-  '((:artist.getinfo       (artist) "bio summary")
+(defparameter *base-url* "http://ws.audioscrobbler.com/2.0/")
+(defparameter *services*  
+  '((:artist.getinfo       (artist)       "bio summary")
     (:artist.getsimilar    (artist limit) "artist name")
-    (:artist.gettoptags    (artist))
+    (:artist.gettoptags    (artist)       "tag name")
     (:artist.gettopalbums  (artist limit) "album name")
     (:artist.gettoptracks  (artist limit) "track > name")
     (:artist.search        (artist limit) "artist name")
     (:album.getinfo        (artist album))
     (:tag.gettoptracks     (tag limit))
-    (:tag.gettopartists    (tag limit) "artist name")))
+    (:tag.gettopartists    (tag limit)    "artist name"))
 
-(defun method-name (method)
-  (first method))
+  "List of all the Web Services supported by the Last.Fm API (see
+  https://www.last.fm/api):
+- The first field of each service denotes the API method.
+- The second field is a list of all the parameters supported by this method.
+- The last field is a string used to extract the relevant information
+  from the xml response received from last.fm for this method.")
 
-(defun options (method)
-  (second method))
+(defun service-method (service) (first service))
+(defun parameters (service) (second service))
+(defun query-string (service) (third service))
 
-(defun query-string (method)
-  (third method))
+(defun request-url (service param-values)
+  "Build and request a last.fm service"
+  (http-request *base-url*
+     :parameters
+     `(("api_key" . ,*api-key*)
+       ("method" .  ,(symbol-name (service-method service)))
+       ;; Build alists by matching up the service's
+       ;; parameters with the user supplied param-values.
+       ,@(mapcar (lambda (m v)
+                   (cons (symbol-name m) v))
+                 (parameters service)
+                 param-values))))
 
-(defun append-method (url method)
-  (concatenate 'string url
-               "&method="
-               (symbol-name (method-name method))))
-
-(defun append-options (url list)
-  "Add each option in the given list to the last.fm query "
-  (concatenate 'string url (forma:t nil "~{&~a=~~a~}" list)))
-
-(defun fill-options (url options)
-  (apply #'format `(nil ,url ,@options)))
-
-(defun build-request-url (method options)
-  (fill-options (append-options (append-method *base-url* method)
-                                (options method))
-                options))
-
-(defun lastfm-get (what &rest options)
-  (let ((method (find what *methods* :key #'first)))
-    (when method
-      (let* ((html (dex:get (build-request-url method options)))
-             (plump:*tag-dispatchers* plump:*xml-tags*)
-             (parsed (plump:parse html))
-             (query (query-string method)))
-        (lquery:$ parsed query (text))))))
-
-(lastfm-get :tag.gettopartists "doom+metal" 5)
-(lastfm-get :artist.getinfo "anathema")
-(lastfm-get :artist.gettopalbums "anathema" 10)
-(lastfm-get :artist.getsimilar "anathema" "")
-(lastfm-get :artist.gettoptracks "anathema" 10)
-(lastfm-get :artist.search "void of" 10)
+(defun lastfm-get (what &rest param-values)
+  (let ((service (find what *services* :key #'first)))
+    (when service
+      (let* ((request (request-url service param-values))
+             ;; Tell plump to parse the request as an xml
+             (*tag-dispatchers* *xml-tags*)
+             (parsed (parse request))
+             (query (query-string service)))
+        ($ parsed query (text))))))
 
