@@ -67,8 +67,7 @@
         (if (multi-query-p service)
             (let ((len (length result)))
               (map 'vector (lambda (p1 p2)
-                             (concatenate 'string
-                                          p1 " - " p2))
+                             (concatenate 'string p1 " - " p2))
                    (subseq result 0 (/ len 2))
                    (subseq result (/ len 2) len)))
             result)
