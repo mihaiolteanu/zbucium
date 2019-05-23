@@ -25,6 +25,7 @@
     (:artist.gettoptracks (artist limit) "track > name")
     (:artist.search       (artist limit) "artist name")
     (:album.getinfo       (artist album) "track > name")
+    (:tag.getinfo         (tag)          "summary")
     (:tag.gettoptracks    (tag limit)    "artist > name, track > name")
     (:tag.gettopartists   (tag limit)    "artist name")
     (:user.getlovedtracks (user limit)   "artist > name, track > name"))
