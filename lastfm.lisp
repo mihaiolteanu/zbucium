@@ -48,7 +48,7 @@
        ;; Build alists by matching up the service's
        ;; parameters with the user supplied param-values.
        ,@(mapcar (lambda (m v)
-                   (cons (symbol-name m) v))
+                   (cons (sb-unicode:lowercase (symbol-name m)) v))
                  (parameters service)
                  param-values))))
 
