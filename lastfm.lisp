@@ -65,10 +65,10 @@
         ;; the artist name in its first half and the song name in its second
         (if (multi-query-p service)
             (let ((len (length result)))
-              (map 'vector (lambda (p1 p2)
+              (map 'list (lambda (p1 p2)
                              (concatenate 'string p1 " - " p2))
                    (subseq result 0 (/ len 2))
                    (subseq result (/ len 2) len)))
-            result)
+            (map 'list #'identity result))
         ))))
 
