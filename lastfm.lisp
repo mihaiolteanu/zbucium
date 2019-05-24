@@ -38,6 +38,7 @@
 (defun service-method (service) (first service))
 (defun parameters (service) (second service))
 (defun query-string (service) (third service))
+(defun multi-query-p (service) (find #\, (query-string service)))
 
 (defun request-url (service param-values)
   "Build and request a last.fm service"
