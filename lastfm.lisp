@@ -7,12 +7,10 @@
 
 (in-package :lastfm)
 
-(defmacro credentials (&rest entries)
-  (dolist (entry entries)
-    (ccase (first entry)
-      (api-key       (defparameter *api-key* (second entry)))
-      (shared-secret (defparameter *shared-secret* (second entry))) 
-      (username      (defparameter *username* (second entry))))))
+(defun config (&key api-key shared-secret username)
+  (defparameter *api-key* api-key)
+  (defparameter *shared-secret* shared-secret)
+  (defparameter *username* username))
 
 (load #P"~/.config/.lastfm.lisp")
 
