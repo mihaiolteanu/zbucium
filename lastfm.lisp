@@ -4,18 +4,20 @@
 (ql:quickload :alexandria)
 (ql:quickload :fare-memoization)
 (ql:quickload :bt-semaphore)
+(ql:quickload :yason)
 
 (defpackage :lastfm
   (:use :cl :drakma :plump :lquery
-        :alexandria
-        :org.tfeb.hax.memoize :bt))
+        :alexandria :bt)
+  (:import-from :yason :parse))
 
 (in-package :lastfm)
 
-(defun config (&key api-key shared-secret username)
+(defun config (&key api-key shared-secret username mpvsocket)
   (defparameter *api-key* api-key)
   (defparameter *shared-secret* shared-secret)
-  (defparameter *username* username))
+  (defparameter *username* username)
+  (defparameter *mpvsocket* mpvsocket))
 
 (load #P"~/.config/.lastfm.lisp")
 
@@ -72,15 +74,14 @@
         (if (multi-query-p service)
             (let ((len (length result)))
               (map 'list (lambda (p1 p2)
-                             (concatenate 'string p1 " - " p2))
+                           (list p1 p2))
                    (subseq result 0 (/ len 2))
                    (subseq result (/ len 2) len)))
-            (map 'list #'identity result))
-        ))))
+            (map 'list #'identity result))))))
 
-(defparameter *playing-thread* nil)
-(defparameter *mpv-string*
-  "mpv --log-file=/home/mihai/quicklisp/local-projects/muse2/mpvlog --msg-level=all=trace ~a")
+(defparameter *mpv-command*
+  (concatenate 'string "mpv --input-ipc-server=" *mpvsocket* " ~a"))
+(defparameter *playing* nil)
 
 (defun mpv-play (youtube-url)
   (when youtube-url
@@ -106,12 +107,14 @@ try and get it from the last.fm song's page."
 (defun play-artist-toptracks (artist &optional (ntracks "20") (nplays 20) (random nil))
   "Play the first 20 tracks for the given artist a maximum of 20 times.
 For nplays=1, this means play a random track from this artists 20 best tracks."
+  (setf *playing* t)
   (let ((tracks (lastfm-get :artist.gettoptracks artist ntracks)))
     (loop for track in (if random
                            (shuffle tracks)
                            tracks)
           for plays from 1 upto nplays
-          do (mpv-play (get-url artist track)))))
+          when *playing*
+            do (mpv-play (get-url artist track)))))
 
 (defun play-artist-similar (artist &optional (limit "3"))
   (let ((artists (lastfm-get :artist.getsimilar artist limit)))
@@ -119,20 +122,55 @@ For nplays=1, this means play a random track from this artists 20 best tracks."
       (play-artist-toptracks artist "20" 1 t))))
 
 (defun play-tag-artists (tag &optional (nartists "3") (nplays 20))
+  (setf *playing* t)
   (let* ((artists (lastfm-get :tag.gettopartists tag nartists))
          (len (parse-integer nartists)))
     (loop for artist = (nth (random len) artists)
             then (nth (random len) artists)
           for plays from 0 upto nplays
-          do (play-artist-toptracks artist "20" 1 t))))
+          when *playing*
+            do (play-artist-toptracks artist "20" 1 t))))
 
 (defun play-user-lovedtracks (user &optional (nsongs "3") (random t))
+  (setf *playing* t)
   (let ((tracks (lastfm-get :user.getlovedtracks user nsongs)))
-    (dolist (track (if random
-                       (shuffle tracks)
-                       tracks))
-      (mpv-play (get-url (first track) (second track))))))
+    (loop for track in (if random
+                           (shuffle tracks)
+                           tracks)
+          when *playing*
+            do (mpv-play (get-url (first track) (second track))))))
 
 (fmemo:memoize 'get-url)
 (fmemo:memoize 'lastfm-get)
+
+
+(defun mpv-command (&rest args)
+  (parse
+   (with-output-to-string (out)
+     (uiop:run-program
+      (format nil "echo '{\"command\": [~{\"~a\"~^, ~}]}' | socat - ~A"
+              args *mpvsocket*)
+      :output out))))
+
+(defun set-mpv-property (property value)
+  (mpv-command "set_property" property value))
+
+(defun get-mpv-property (property)
+  (gethash "data" (mpv-command "get_property" property)))
+
+(defun toggle-play ()
+  "Toggle playing status"
+  (mpv-command "cycle" "pause"))
+
+(defun pause ()
+  "Make sure the player is paused"
+  (unless (get-mpv-property "pause")
+    (toggle-play)))
+
+(defun quit-mpv ()
+  (mpv-command "quit" 0))
+
+(defun stop-player ()
+  (setf *playing* nil)
+  (quit-mpv))
 
