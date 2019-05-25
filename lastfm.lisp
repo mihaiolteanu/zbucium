@@ -1,9 +1,14 @@
 (ql:quickload :drakma)
 (ql:quickload :plump)
 (ql:quickload :lquery)
+(ql:quickload :alexandria)
+(ql:quickload :memoize)
+(ql:quickload :bt-semaphore)
 
 (defpackage :lastfm
-  (:use :cl :drakma :plump :lquery))
+  (:use :cl :drakma :plump :lquery
+        :alexandria
+        :org.tfeb.hax.memoize :bt))
 
 (in-package :lastfm)
 
@@ -73,3 +78,50 @@
             (map 'list #'identity result))
         ))))
 
+(defparameter *playing-thread* nil)
+(defparameter *mpv-string*
+  "mpv --log-file=/home/mihai/quicklisp/local-projects/muse2/mpvlog --msg-level=all=trace ~a")
+
+(defun mpv-play (youtube-url)
+  (when youtube-url
+    (setf *playing-thread*
+        (uiop:run-program
+         (format nil *mpv-string* youtube-url)))))
+
+(defun get-url (artist song)
+  "Since there is no youtube link available through the last.fm API,
+try and get it from the last.fm song's page."
+  (let* ((url (format nil "https://www.last.fm/music/~a/_/~a"
+                      (substitute #\+ #\Space artist)
+                      (substitute #\+ #\Space song)))
+         (request (http-request url))
+         (links ($ (inline (parse request))
+                  "[data-playlink-affiliate]" (attr "data-youtube-url") )))
+    (if (> (length links) 0)
+        ;; Two identical links are available on the page.
+        (aref links 0)
+        ;; This song has no youtube link information.
+        nil)))
+
+(defun play-artist-toptracks (artist &optional (ntracks "20") (nplays 20) (random nil))
+  "Play the first 20 tracks for the given artist a maximum of 20 times.
+For nplays=1, this means play a random track from this artists 20 best tracks."
+  (let ((tracks (lastfm-get :artist.gettoptracks artist ntracks)))
+    (loop for track in (if random
+                           (shuffle tracks)
+                           tracks)
+          for plays from 1 upto nplays
+          do (mpv-play (get-url artist track)))))
+
+(defun play-artist-similar (artist &optional (limit "3"))
+  (let ((artists (lastfm-get :artist.getsimilar artist limit)))
+    (dolist (artist (shuffle artists))
+      (play-artist-toptracks artist "20" 1 t))))
+
+(defun play-tag-artists (tag &optional (nartists "3") (nplays 20))
+  (let* ((artists (lastfm-get :tag.gettopartists tag nartists))
+         (len (parse-integer nartists)))
+    (loop for artist = (nth (random len) artists)
+            then (nth (random len) artists)
+          for plays from 0 upto nplays
+          do (play-artist-toptracks artist "20" 1 t))))
