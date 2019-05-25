@@ -2,7 +2,7 @@
 (ql:quickload :plump)
 (ql:quickload :lquery)
 (ql:quickload :alexandria)
-(ql:quickload :memoize)
+(ql:quickload :fare-memoization)
 (ql:quickload :bt-semaphore)
 
 (defpackage :lastfm
@@ -125,3 +125,14 @@ For nplays=1, this means play a random track from this artists 20 best tracks."
             then (nth (random len) artists)
           for plays from 0 upto nplays
           do (play-artist-toptracks artist "20" 1 t))))
+
+(defun play-user-lovedtracks (user &optional (nsongs "3") (random t))
+  (let ((tracks (lastfm-get :user.getlovedtracks user nsongs)))
+    (dolist (track (if random
+                       (shuffle tracks)
+                       tracks))
+      (mpv-play (get-url (first track) (second track))))))
+
+(fmemo:memoize 'get-url)
+(fmemo:memoize 'lastfm-get)
+
