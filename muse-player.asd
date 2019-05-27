@@ -11,6 +11,7 @@
                :fare-memoization
                :yason)
   :serial t
-  :components ((:file "packages") 
+  :components ((:file "packages")
+               (:file "mpv")
                (:file "muse-player"))
   :in-order-to ((test-op (test-op "muse-player/tests"))))
