@@ -54,25 +54,32 @@ try and get it from the last.fm song's page."
                     (second artist+song)))
         random))
 
-(let ((keep-playing nil)
+(let ((playing-thread nil)
       (playing-item nil))
   (defun play (playlist fn random &key (oneshot nil))
-    (setf keep-playing t)
-    (loop for play-item in (if random
-                               (shuffle playlist)
-                               playlist)
-          when keep-playing
-            do (progn (setf playing-item play-item)
-                      (funcall fn play-item))
-          when oneshot
-            do (return)))
+    (setf playing-thread
+          (make-thread
+           (lambda ()
+             (loop for play-item in (if random
+                                        (shuffle playlist)
+                                        playlist)
+                   do (progn (setf playing-item play-item)
+                             (funcall fn play-item))
+                   when oneshot
+                     do (return)))
+           :name "muse-player")))
 
   (defun what-is-playing ()
-    playing-item)
+    (format nil "~a - ~a"
+            (string-capitalize (first playing-item))
+            (second playing-item)))
 
   (defun stop-playing ()
-    (setf keep-playing nil)
+    (destroy-thread playing-thread)
     (setf playing-item nil)))
+
+(defun next-song ()
+  (quit-mpv))
 
 (defun stop-player ()
   (stop-playing)

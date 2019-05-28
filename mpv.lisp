@@ -26,14 +26,20 @@
 (defun get-mpv-property (property)
   (gethash "data" (mpv-command "get_property" property)))
 
-(defun toggle-play ()
+(defun play/pause ()
   "Toggle playing status"
   (mpv-command "cycle" "pause"))
 
-(defun pause ()
+(defun pause-player ()
   "Make sure the player is paused"
   (unless (get-mpv-property "pause")
     (toggle-play)))
+
+(defun replay-song ()
+  (set-mpv-property "percent-pos" 0))
+
+(defun forward-song (seconds)
+  (mpv-command "seek" seconds))
 
 (defun quit-mpv ()
   (mpv-command "quit" 0))
