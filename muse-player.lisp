@@ -1,86 +1,65 @@
 (in-package :muse-player)
 
-(defun youtube-play (artist track)
-  (mpv-play (get-youtube-url artist track)))
+(defun play-song (name)
+  (play name))
 
-(defun get-youtube-url (artist song)
-  "Since there is no youtube link available through the last.fm API,
-try and get it from the last.fm song's page."
-  (let* ((url (format nil "https://www.last.fm/music/~a/_/~a"
-                      (substitute #\+ #\Space artist)
-                      (substitute #\+ #\Space song)))
-         (request (http-request url))
-         (links ($ (inline (plump:parse request))
-                  "[data-playlink-affiliate]" (attr "data-youtube-url") )))
-    (if (> (length links) 0)
-        ;; Two identical links are available on the page.
-        (aref links 0)
-        ;; This song has no youtube link information.
-        nil)))
-
-(fmemo:memoize 'get-youtube-url)
-
-(defun play-artist-toptracks (artist &key (limit "20") (random nil) (oneshot nil))
-  (play (mapcar (lambda (track)
-                  (list artist track))
-                (lastfm-get :artist.gettoptracks artist limit))
-        (lambda (artist+track)
-          (youtube-play artist (second artist+track)))
-        random
-        :oneshot oneshot))
-
-(defun play-artist-similar (artist &key (limit "3"))
-  (play (lastfm-get :artist.getsimilar artist limit)
-        (lambda (artist)
-          (play-artist-toptracks artist
-                                 :limit limit
-                                 :random t
-                                 :oneshot t))
-        t))
-
-(defun play-tag-artists (tag &optional (limit "3"))
-  (play (lastfm-get :tag.gettopartists tag limit)
-        (lambda (artist)
-          (play-artist-toptracks artist
-                                 :limit limit
-                                 :random t
-                                 :oneshot t))
-        t))
-
-(defun play-user-lovedtracks (user &optional (limit "3") (random t))
-  (play (lastfm-get :user.getlovedtracks user limit)
-        (lambda (artist+song)
-          (youtube-play (first artist+song)
-                    (second artist+song)))
-        random))
-
-(let ((playing-thread nil)
-      (playing-item nil))
-  (defun play (playlist fn random &key (oneshot nil))
-    (setf playing-thread
-          (make-thread
-           (lambda ()
-             (loop for play-item in (if random
-                                        (shuffle playlist)
-                                        playlist)
-                   do (progn (setf playing-item play-item)
-                             (funcall fn play-item))
-                   when oneshot
-                     do (return)))
-           :name "muse-player")))
+(let ((still-playing nil)
+      (playing-song nil))
+  
+  (defun set-playing-song (artist-and-song)
+    (setf playing-song artist-and-song))
 
   (defun what-is-playing ()
-    (format nil "~a - ~a"
-            (string-capitalize (first playing-item))
-            (second playing-item)))
+    playing-song)
 
-  (defun stop-playing ()
-    (destroy-thread playing-thread)
-    (setf playing-item nil)))
+  (defun start-playing ()
+    (setf still-playing T))
 
-(defun next-song ()
-  (quit-mpv))
+  (defun stop ()
+    (setf still-playing nil)
+    (set-playing-song nil)
+    (youtube:quit))
+  
+  (defun play-simple (songs-generator play-item-fn)
+    (start-playing)
+    (loop for song = (next songs-generator)
+            then (next songs-generator)
+          while still-playing
+          do (let ((artist-and-song (funcall play-item-fn song)))
+               (set-playing-song artist-and-song)
+               (youtube:play
+                (concatenate 'string (first artist-and-song)
+                             " " (second artist-and-song))))))
 
-(defun stop-player ()
-  (stop-playing)
-  (quit-mpv))
+  (defun play-artist (artist nsongs random)
+    (play-simple (artist-songs artist nsongs random)
+                 (lambda (song)
+                   (list artist song))))
+
+  (defun play-tag (tag nsongs random)
+    (play-simple (tag-songs tag nsongs random)
+                 (lambda (song)
+                   (list (first song) (second song)))))
+
+  (defun play-artist-similar-artists (artist nartists nsongs)
+    (play-simple (artist-similar-artists-songs artist nartists nsongs)
+                 (lambda (song)
+                   (list (first song) (second song))))))
+
+(defun replay () (youtube:replay))
+(defun switch-to-browser () (youtube:switch-to-browser))
+(defun skip-song () (youtube:quit))
+(defun play/pause () (youtube:play/pause))
+(defun seek (seconds) (youtube:seek seconds))
+
+;; (youtube:replay)
+;; (what-is-playing)
+;; (youtube:switch-to-browser)
+;; (youtube:quit)
+;; (stop)
+;; (play/pause)
+;; (play-artist "anathema" 3 T)
+;; (play-artist-similar-artists "anathema" "3" "3")
+;; (play-tag "doom metal" "10" T)
+
+;; (lastfm:random-artist-song "anathema" 20)
