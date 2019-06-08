@@ -4,14 +4,17 @@
   :license "GPLv3"
   :version "0.1"
   :depends-on (:lastfm
+               :youtube
+               :lyrics
                :drakma
+               :bordeaux-threads
                :plump
                :lquery
                :alexandria
                :fare-memoization
+               :generators
                :yason)
   :serial t
   :components ((:file "packages")
-               (:file "mpv")
                (:file "muse-player"))
   :in-order-to ((test-op (test-op "muse-player/tests"))))
