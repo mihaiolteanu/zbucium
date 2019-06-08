@@ -4,13 +4,15 @@
   (play name))
 
 (let ((still-playing nil)
-      (playing-song nil))
+      (artist nil)
+      (song nil))
   
   (defun set-playing-song (artist-and-song)
-    (setf playing-song artist-and-song))
+    (setf artist (first artist-and-song))
+    (setf song (second artist-and-song)))
 
   (defun what-is-playing ()
-    playing-song)
+    (list artist song))
 
   (defun start-playing ()
     (setf still-playing T))
@@ -24,18 +26,18 @@
     (start-playing)
     (make-thread
      (lambda ()
-       (loop for song = (next songs-generator)
+       (loop for artist-and-song = (next songs-generator)
                then (next songs-generator)
              ;; Make sure there is a way to stop this endless loop.
              while still-playing
              do (progn
-                  (set-playing-song song)
+                  (set-playing-song artist-and-song)
                   (youtube:play
                    ;; Either pass the song url from the last.fm pages, if it
                    ;; exists, or pass a youtube-searchable string for the artist
                    ;; and song.
-                   (or (song-youtube-url (first song) (second song))
-                       (concatenate 'string (first song) " " (second song)))))))))
+                   (or (song-youtube-url artist song)
+                       (concatenate 'string artist " " song))))))))
 
   (defun play-artist (artist nsongs random)
     (play-simple (artist-songs artist nsongs random)))
