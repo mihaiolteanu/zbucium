@@ -20,33 +20,26 @@
     (set-playing-song nil)
     (youtube:quit))
   
-  (defun play-simple (songs-generator play-item-fn)
+  (defun play-simple (songs-generator)
     (start-playing)
     (make-thread
      (lambda ()
        (loop for song = (next songs-generator)
                then (next songs-generator)
              while still-playing
-             do (let ((artist-and-song (funcall play-item-fn song)))
-                  (set-playing-song artist-and-song)
+             do (progn
+                  (set-playing-song song)
                   (youtube:play
-                   (concatenate 'string (first artist-and-song)
-                                " " (second artist-and-song))))))))
+                   (concatenate 'string (first song) " " (second song))))))))
 
   (defun play-artist (artist nsongs random)
-    (play-simple (artist-songs artist nsongs random)
-                 (lambda (song)
-                   (list artist song))))
+    (play-simple (artist-songs artist nsongs random)))
 
   (defun play-tag (tag nsongs random)
-    (play-simple (tag-songs tag nsongs random)
-                 (lambda (song)
-                   (list (first song) (second song)))))
+    (play-simple (tag-songs tag nsongs random)))
 
   (defun play-artist-similar-artists (artist nartists nsongs)
-    (play-simple (artist-similar-artists-songs artist nartists nsongs)
-                 (lambda (song)
-                   (list (first song) (second song))))))
+    (play-simple (artist-similar-artists-songs artist nartists nsongs))))
 
 (defun next-song ()
   "Close the current youtube session, forcing the generator to take and play the
