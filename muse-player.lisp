@@ -31,17 +31,20 @@
              ;; Make sure there is a way to stop this endless loop.
              while still-playing
              do (progn
-                  (set-playing-song artist-and-song)
-                  ;; Save the lyrics for each song that is being played.
-                  (make-thread
-                   (lambda ()
-                     (lyrics artist song)))
-                  (youtube:play
-                   ;; Either pass the song url from the last.fm pages, if it
-                   ;; exists, or pass a youtube-searchable string for the artist
-                   ;; and song.
-                   (or (song-youtube-url artist song)
-                       (concatenate 'string artist " " song))))))))
+                  (set-playing-song artist-and-song)                  
+                  (play-song artist song)
+                  ;; Wait for this song to end before playing the next one.
+                  )))))
+
+  (defun play-song (artist song)
+    "Play a single song, by either trying to get the youtube url from last.fm,
+     or if that fails, call youtube-dl directly with a search string."
+    (youtube:play
+     (or (song-youtube-url artist song)
+         (concatenate 'string artist " " song)))
+    ;; Save the lyrics for each song that is being played.
+    (make-thread (lambda ()
+                   (lyrics artist song))))
 
   (defun play-artist (artist nsongs random)
     (play-simple (artist-songs artist nsongs random)))
