@@ -22,14 +22,16 @@
   
   (defun play-simple (songs-generator play-item-fn)
     (start-playing)
-    (loop for song = (next songs-generator)
-            then (next songs-generator)
-          while still-playing
-          do (let ((artist-and-song (funcall play-item-fn song)))
-               (set-playing-song artist-and-song)
-               (youtube:play
-                (concatenate 'string (first artist-and-song)
-                             " " (second artist-and-song))))))
+    (make-thread
+     (lambda ()
+       (loop for song = (next songs-generator)
+               then (next songs-generator)
+             while still-playing
+             do (let ((artist-and-song (funcall play-item-fn song)))
+                  (set-playing-song artist-and-song)
+                  (youtube:play
+                   (concatenate 'string (first artist-and-song)
+                                " " (second artist-and-song))))))))
 
   (defun play-artist (artist nsongs random)
     (play-simple (artist-songs artist nsongs random)
