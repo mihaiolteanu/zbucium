@@ -48,11 +48,10 @@
                  (lambda (song)
                    (list (first song) (second song))))))
 
-(defun replay () (youtube:replay))
-(defun switch-to-browser () (youtube:switch-to-browser))
-(defun skip-song () (youtube:quit))
-(defun play/pause () (youtube:play/pause))
-(defun seek (seconds) (youtube:seek seconds))
+(defun next-song ()
+  "Close the current youtube session, forcing the generator to take and play the
+next song."
+  (youtube:quit))
 
 ;; (youtube:replay)
 ;; (what-is-playing)
