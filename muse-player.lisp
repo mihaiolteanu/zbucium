@@ -32,6 +32,10 @@
              while still-playing
              do (progn
                   (set-playing-song artist-and-song)
+                  ;; Save the lyrics for each song that is being played.
+                  (make-thread
+                   (lambda ()
+                     (lyrics artist song)))
                   (youtube:play
                    ;; Either pass the song url from the last.fm pages, if it
                    ;; exists, or pass a youtube-searchable string for the artist
