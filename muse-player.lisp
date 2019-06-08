@@ -26,6 +26,7 @@
      (lambda ()
        (loop for song = (next songs-generator)
                then (next songs-generator)
+             ;; Make sure there is a way to stop this endless loop.
              while still-playing
              do (progn
                   (set-playing-song song)
@@ -42,8 +43,14 @@
   (defun play-tag (tag nsongs random)
     (play-simple (tag-songs tag nsongs random)))
 
+  (defun play-user-songs (username nsongs random)
+    (play-simple (user-songs username nsongs random)))
+
   (defun play-artist-similar-artists (artist nartists nsongs)
-    (play-simple (artist-similar-artists-songs artist nartists nsongs))))
+    (play-simple (artist-similar-artists-songs artist nartists nsongs)))
+
+  (defun play-tag-similar-artists (tag nartsits nsongs)
+    (play-simple (tag-similar-artists-songs tag nartists nsongs))))
 
 (defun next-song ()
   "Close the current youtube session, forcing the generator to take and play the
