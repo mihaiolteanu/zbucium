@@ -56,7 +56,16 @@
     (play-simple (artist-similar-artists-songs artist nartists nsongs)))
 
   (defun play-tag-similar-artists (tag nartsits nsongs)
-    (play-simple (tag-similar-artists-songs tag nartists nsongs))))
+    (play-simple (tag-similar-artists-songs tag nartists nsongs)))
+
+  (defun song-lyrics ()
+    (lyrics artist song))
+
+  (defun love-song ()
+    (track-love artist song))
+
+  (defun unlove-song ()
+    (track-unlove artist song)))
 
 (defun next-song ()
   "Close the current youtube session, forcing the generator to take and play the
