@@ -4,6 +4,7 @@
   (play name))
 
 (let ((still-playing nil)
+      (playing-thread nil)
       (artist nil)
       (song nil))
   
@@ -23,28 +24,33 @@
     (youtube:quit))
   
   (defun play-simple (songs-generator)
+    ;; Quit player and wait for cleanup before starting another play.
+    (when still-playing
+      (stop)
+      (bt:join-thread playing-thread))
     (start-playing)
-    (make-thread
-     (lambda ()
-       (loop for artist-and-song = (next songs-generator)
-               then (next songs-generator)
-             ;; Make sure there is a way to stop this endless loop.
-             while still-playing
-             do (progn
-                  (set-playing-song artist-and-song)                  
-                  (play-song artist song)
-                  ;; Wait for this song to end before playing the next one.
-                  )))))
+    (setf playing-thread
+          (make-thread
+           (lambda ()
+             (loop for artist-and-song = (next songs-generator)
+                     then (next songs-generator)
+                   ;; Make sure there is a way to stop this endless loop.
+                   while still-playing
+                   do (progn
+                        (set-playing-song artist-and-song)
+                        ;; Save the lyrics for each song that is being played.
+                        (make-thread (lambda ()
+                                       (lyrics artist song)))
+                        (youtube:play
+                         (or (song-youtube-url artist song)
+                             (concatenate 'string artist " " song)))
+                        ;; Wait for this song to end before playing the next one.
+                        ))))))
 
   (defun play-song (artist song)
-    "Play a single song, by either trying to get the youtube url from last.fm,
-     or if that fails, call youtube-dl directly with a search string."
-    (youtube:play
-     (or (song-youtube-url artist song)
-         (concatenate 'string artist " " song)))
-    ;; Save the lyrics for each song that is being played.
-    (make-thread (lambda ()
-                   (lyrics artist song))))
+    "Play and replay a single song"
+    (play-simple (make-generator ()
+                     (loop do (yield (list artist song))))))
 
   (defun play-artist (artist nsongs random)
     (play-simple (artist-songs artist nsongs random)))
