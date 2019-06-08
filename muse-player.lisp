@@ -30,7 +30,11 @@
              do (progn
                   (set-playing-song song)
                   (youtube:play
-                   (concatenate 'string (first song) " " (second song))))))))
+                   ;; Either pass the song url from the last.fm pages, if it
+                   ;; exists, or pass a youtube-searchable string for the artist
+                   ;; and song.
+                   (or (song-youtube-url (first song) (second song))
+                       (concatenate 'string (first song) " " (second song)))))))))
 
   (defun play-artist (artist nsongs random)
     (play-simple (artist-songs artist nsongs random)))
