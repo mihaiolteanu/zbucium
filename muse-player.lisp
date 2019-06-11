@@ -19,15 +19,15 @@
     (setf still-playing T))
 
   (defun stop ()
-    (setf still-playing nil)
-    (set-playing-song nil)
-    (youtube:quit))
+    (when still-playing
+      (setf still-playing nil)
+      (youtube:quit)
+      (bt:join-thread playing-thread)
+      (set-playing-song nil)))
   
   (defun play-simple (songs-generator)
     ;; Quit player and wait for cleanup before starting another play.
-    (when still-playing
-      (stop)
-      (bt:join-thread playing-thread))
+    (stop)
     (start-playing)
     (setf playing-thread
           (make-thread
