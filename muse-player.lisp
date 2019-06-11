@@ -97,15 +97,3 @@
   "Close the current youtube session, forcing the generator to take and play the
 next song."
   (youtube:quit))
-
-;; (youtube:replay)
-;; (what-is-playing)
-;; (youtube:switch-to-browser)
-;; (youtube:quit)
-;; (stop)
-;; (play/pause)
-;; (play-artist "anathema" 3 T)
-;; (play-artist-similar-artists "anathema" "3" "3")
-;; (play-tag "doom metal" "10" T)
-
-;; (lastfm:random-artist-song "anathema" 20)
