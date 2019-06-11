@@ -29,6 +29,11 @@
     (setf playing-thread
           (make-thread
            (lambda ()
+             ;; Take a new song from the generator, save the lyrics for it,
+             ;; scrobble it if needed and either find a youtube url to play or
+             ;; create a string that can be searched by youtube-dl. Repeat after
+             ;; the song finishes or was stopped by the user. End the loop only
+             ;; when the player is stopped by the user.
              (loop for artist-and-song = (next songs-generator)
                      then (next songs-generator)
                    ;; Make sure there is a way to stop this endless loop.
