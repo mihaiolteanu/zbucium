@@ -1,8 +1,5 @@
 (in-package :muse-player)
 
-(defun play-song (name)
-  (play name))
-
 (let ((still-playing nil)
       (playing-thread nil)
       (artist nil)
@@ -22,7 +19,7 @@
     (when still-playing
       (setf still-playing nil)
       (youtube:quit)
-      (bt:join-thread playing-thread)
+      (join-thread playing-thread)
       (set-playing-song nil)))
   
   (defun play-simple (songs-generator)
