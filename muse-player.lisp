@@ -55,6 +55,9 @@
   (defun play-artist (artist nsongs random)
     (play-simple (artist-songs artist nsongs random)))
 
+  (defun play-artist-album (artist album)
+    (play-simple (artist-album-songs artist album)))
+
   (defun play-tag (tag nsongs random)
     (play-simple (tag-songs tag nsongs random)))
 
