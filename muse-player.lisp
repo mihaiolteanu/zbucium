@@ -45,7 +45,8 @@
                          (or (song-youtube-url artist song)
                              (concatenate 'string artist " " song)))
                         ;; Wait for this song to end before playing the next one.
-                        ))))))
+                        )))
+           :name "muse playing thread")))
 
   (defun play-song (artist song)
     "Play and replay a single song"
