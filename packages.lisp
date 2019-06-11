@@ -5,6 +5,8 @@
   (:import-from :bordeaux-threads :make-thread)
   (:import-from :bordeaux-threads :join-thread)
   (:shadowing-import-from :yason :parse)
+  (:import-from :local-time :timestamp-to-unix)
+  (:import-from :local-time :now)
   (:export play-song
            play-artist
            play-artist-album

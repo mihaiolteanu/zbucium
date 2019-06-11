@@ -11,6 +11,7 @@
                :plump
                :lquery
                :alexandria
+               :local-time
                :fare-memoization
                :generators
                :yason)

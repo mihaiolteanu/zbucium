@@ -34,10 +34,21 @@
                    ;; Make sure there is a way to stop this endless loop.
                    while still-playing
                    do (progn
-                        (set-playing-song artist-and-song)
-                        ;; Save the lyrics for each song that is being played.
-                        (make-thread (lambda ()
-                                       (lyrics artist song)))
+                        (set-playing-song artist-and-song)                        
+                        (let ((initial-artist artist)
+                              (initial-song song))
+                          (make-thread
+                           (lambda ()
+                             ;; Save the lyrics for each song that is being played.
+                             (lyrics artist song)
+                             ;; If, after waking up, the same song is playing,
+                             ;; scrobble it.
+                             (sleep 20)
+                             (when (and (string-equal initial-artist artist)
+                                        (string-equal initial-song song))
+                               (track-scrobble artist song
+                                               (timestamp-to-unix (now)))))))
+                        
                         (youtube:play
                          (or (song-youtube-url artist song)
                              (concatenate 'string artist " " song)))
