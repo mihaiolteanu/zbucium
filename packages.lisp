@@ -1,25 +1,34 @@
-(defpackage :mpv
-  (:use :cl)
-  (:import-from :uiop :run-program)
-  (:export mpv-play
-           play/pause
-           replay-song
-           forward-song
-           quit-mpv))
-
 (defpackage :muse-player
-  (:use :cl :plump :lquery :alexandria :bt :lastfm)
+  (:use :cl :plump :lquery :alexandria :generators
+        :bt :lastfm :youtube :lyrics)
   (:import-from :drakma :http-request)
   (:import-from :bordeaux-threads :make-thread)
   (:import-from :bordeaux-threads :join-thread)
   (:shadowing-import-from :yason :parse)
-  (:export play-artist-toptracks
-           play-artist-similar
-           play-tag-artists
-           play-user-lovedtracks
-           next-song
+  (:export play-song
+           play-artist
+           play-artist-album
+           play-tag
+           play-user-songs
+           play-artist-similar-artists
+           play-tag-similar-artists
+
+           song-lyrics
+           search-song
+
            what-is-playing
-           replay-song
-           forward-song
+           pause
            play/pause
-           stop-player))
+           replay
+           seek
+           percent-pos
+           time-pos
+           duration
+           switch-to-browser
+           turn-video-on
+           next-song
+           stop
+
+           love-song
+           unlove-song
+           ))
