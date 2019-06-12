@@ -1,11 +1,16 @@
 # zbucium
-last.fm music player with lyrics and scrobble support, among other things.
+[last.fm](https://www.last.fm/home) music player with lyrics and scrobble support, among other things.
 
 This is a Common Lisp library that can be used to build a more interactive music
-player on top (with stumpwm, for example) or can be used as such. It depends on
-the lastfm, youtube and lyrics libraries by the same author. The songs are
-played by the mpv player from youtube, in the background, with input from
-last.fm.
+player on top, like the
+[zbucium-stump](https://github.com/mihaiolteanu/zbucium-stump) player for the
+StumpWM window manager for which this library was created in the first
+place. But it can also be used as such. It depends on the
+[lastfm](https://github.com/mihaiolteanu/lastfm),
+[youtube](https://github.com/mihaiolteanu/youtube) and
+[lyrics](https://github.com/mihaiolteanu/lyrics) libraries by the same
+author. The songs are played from youtube with the mpv player, in the background,
+with input from last.fm.
 
 # Installation
 Install [lastfm](https://github.com/mihaiolteanu/lastfm),
@@ -53,7 +58,8 @@ like play/pause, seek, stop or request the opening of the youtube page in your
 default browser.
 
 But you can also feed the player an infinite stream of songs, thanks to the
-`lastfm` provided generators. This will play the best 30 songs from `anathema`
+[generators](https://github.com/mihaiolteanu/lastfm#generators) provided by the
+lastfm library. This will play the best 30 songs from `anathema`
 (based on the last.fm recomendations), at random, until yout `stop` it or until
 you chose to play something else.
 ```common-lisp
