@@ -98,10 +98,10 @@ stopped by the user. End the loop only when the player is stopped by the user."
 (defun play-my-loved-songs (nsongs random)
   (play-simple (my-loved-songs nsongs random)))
 
-(defun play-artist-similar-artists (artist nartists nsongs)
+(defun play-artist-similar (artist nartists nsongs)
   (play-simple (artist-similar-artists-songs artist nartists nsongs)))
 
-(defun play-tag-similar-artists (tag nartists nsongs)
+(defun play-tag-similar (tag nartists nsongs)
   (play-simple (tag-similar-artists-songs tag nartists nsongs)))
 
 (defun song-lyrics ()

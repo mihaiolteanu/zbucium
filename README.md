@@ -68,7 +68,7 @@ artists. The higher the values, the higher the chances to discover hidden gems.
 ```common-lisp
 ; Play the best three matching artists and play from the best ten songs for
 ; those matching artists
-(play-artist-similar-artists "anathema" 3 10)
+(play-artist-similar "anathema" 3 10)
 ```
 
 ```common-lisp
@@ -100,7 +100,7 @@ artists. The higher the values, the higher the chances to discover hidden gems.
 **play-tag** _tag nsongs random_
 
     Play the best songs for this tag (genre, usually). There is a similar
-    `play-tag-similar-artists` function but the results are different.
+    `play-tag-similar` function but the results are different.
 
 **play-user-songs** _username nsongs random_
 
@@ -112,13 +112,13 @@ artists. The higher the values, the higher the chances to discover hidden gems.
     Play from the list of my loved songs. The username in this case is base on
     the lastfm configuration.
 
-**play-artist-similar-artists** _artist nartists nsongs_
+**play-artist-similar** _artist nartists nsongs_
 
     Picks a random artist from the top nartists that last.fm says are the most
     similar to this artist. After that, pick a random song from the first best
     nsongs of the selected artist and play it. 
 
-**play-tag-similar-artists** _tag nartists nsongs_
+**play-tag-similar** _tag nartists nsongs_
 
     Picks a random artist from the top nartists that last.fm says are the most
     representative for this tag (genre, usually). After that, pick a random song

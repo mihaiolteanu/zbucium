@@ -14,8 +14,8 @@
            play-tag
            play-user-songs
            play-my-loved-songs
-           play-artist-similar-artists
-           play-tag-similar-artists
+           play-artist-similar
+           play-tag-similar
            what-is-playing
            what-is-playing-as-string
            song-lyrics
