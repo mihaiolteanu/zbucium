@@ -10,7 +10,7 @@
   (:export ;; Functionality implemented by this library
            play-song
            play-artist
-           play-artist-album
+           play-album
            play-tag
            play-user-songs
            play-my-loved-songs

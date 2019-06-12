@@ -86,7 +86,7 @@ stopped by the user. End the loop only when the player is stopped by the user."
 (defun play-artist (artist nsongs random)
   (play-simple (artist-songs artist nsongs random)))
 
-(defun play-artist-album (artist album)
+(defun play-album (artist album)
   (play-simple (artist-album-songs artist album)))
 
 (defun play-tag (tag nsongs random)

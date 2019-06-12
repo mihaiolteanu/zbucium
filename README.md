@@ -93,7 +93,7 @@ artists. The higher the values, the higher the chances to discover hidden gems.
     Play the best nsongs, as reported by last.fm, for the given artist, in
     random order or one after another. 
 
-**play-artist-album** _artist album_
+**play-album** _artist album_
 
     Play a single album from the given artist.
 
