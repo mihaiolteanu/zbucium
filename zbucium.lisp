@@ -1,4 +1,4 @@
-(in-package :muse-player)
+(in-package :zbucium)
 
 (defparameter *still-playing* nil
   "Set to true when player started, set to nil when stopped.")
@@ -67,7 +67,7 @@ stopped by the user. End the loop only when the player is stopped by the user."
                            (concatenate 'string *artist* " " *song*)))
                       ;; Wait for this song to end before playing the next one.
                       )))
-         :name "muse playing thread")))
+         :name "zbucium playing thread")))
 
 ;; Exported interfaces. Most of these functions simply create lastfm generators
 ;; that are passed to play-simple.

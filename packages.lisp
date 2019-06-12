@@ -1,4 +1,4 @@
-(defpackage :muse-player
+(defpackage :zbucium
   (:use :cl :plump :lquery :alexandria :generators
         :bt :lastfm :youtube :lyrics)
   (:import-from :drakma :http-request)

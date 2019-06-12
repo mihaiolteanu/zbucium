@@ -1,5 +1,5 @@
-(asdf:defsystem :muse-player
-  :description "Music player"
+(asdf:defsystem :zbucium
+  :description "last.fm music player with lyrics"
   :author "Mihai Olteanu"
   :license "GPLv3"
   :version "0.1"
@@ -17,5 +17,4 @@
                :yason)
   :serial t
   :components ((:file "packages")
-               (:file "muse-player"))
-  :in-order-to ((test-op (test-op "muse-player/tests"))))
+               (:file "zbucium")))
