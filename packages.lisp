@@ -7,18 +7,25 @@
   (:shadowing-import-from :yason :parse)
   (:import-from :local-time :timestamp-to-unix)
   (:import-from :local-time :now)
-  (:export play-song
+  (:export ;; Functionality implemented by this library
+           play-song
            play-artist
            play-artist-album
            play-tag
            play-user-songs
            play-artist-similar-artists
            play-tag-similar-artists
-
+           what-is-playing
            song-lyrics
+           love-song
+           unlove-song
+           next-song
+           stop
+
+           ;; Reexported from lyrics
            search-song
 
-           what-is-playing
+           ;; Reexported from youtube
            pause
            play/pause
            replay
@@ -28,9 +35,4 @@
            duration
            switch-to-browser
            turn-video-on
-           next-song
-           stop
-
-           love-song
-           unlove-song
            ))
