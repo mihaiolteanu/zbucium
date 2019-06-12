@@ -13,6 +13,7 @@
            play-artist-album
            play-tag
            play-user-songs
+           play-my-loved-songs
            play-artist-similar-artists
            play-tag-similar-artists
            what-is-playing

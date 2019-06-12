@@ -107,6 +107,11 @@ artists. The higher the values, the higher the chances to discover hidden gems.
     Play the first nsongs from the list of user loved songs. Can be played at
     random or one after another.
 
+**play-my-loved-songs** _nsongs random_
+
+    Play from the list of my loved songs. The username in this case is base on
+    the lastfm configuration.
+
 **play-artist-similar-artists** _artist nartists nsongs_
 
     Picks a random artist from the top nartists that last.fm says are the most
