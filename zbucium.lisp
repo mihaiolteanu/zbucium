@@ -23,6 +23,13 @@
 (defun what-is-playing ()
   (list *artist* *song*))
 
+(defun what-is-playing-as-string ()
+  "Return a printable representation of the artist and song currently playing. If the player is stopped, return an empty string."
+  (when *still-playing*
+    (format nil "~a - ~a"
+            (string-capitalize *artist*)
+            (string-capitalize *song*))))
+
 (defun start-playing ()
   (setf *still-playing* T))
 
@@ -95,13 +102,16 @@ stopped by the user. End the loop only when the player is stopped by the user."
   (play-simple (tag-similar-artists-songs tag nartists nsongs)))
 
 (defun song-lyrics ()
-  (lyrics *artist* *song*))
+  (when *still-playing*
+    (lyrics *artist* *song*)))
 
 (defun love-song ()
-  (track-love *artist* *song*))
+  (when *still-playing*
+    (track-love *artist* *song*)))
 
 (defun unlove-song ()
-  (track-unlove *artist* *song*))
+  (when *still-playing*
+    (track-unlove *artist* *song*)))
 
 (defun next-song ()
   "Close the current youtube session, forcing the generator to take and play the

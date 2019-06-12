@@ -16,6 +16,7 @@
            play-artist-similar-artists
            play-tag-similar-artists
            what-is-playing
+           what-is-playing-as-string
            song-lyrics
            love-song
            unlove-song
