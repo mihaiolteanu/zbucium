@@ -13,7 +13,7 @@
 (defparameter *song* nil
   "The name of the currently playing song.")
 
-(defconstant +scrobble-timeout+ 30
+(defconstant +scrobble-timeout+ 60
   "Time to wait, in seconds, before scrobbling the current playing song.")
 
 (defun set-playing-song (artist-and-song)
