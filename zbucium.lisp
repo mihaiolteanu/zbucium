@@ -72,6 +72,7 @@ stopped by the user. End the loop only when the player is stopped by the user."
                       (youtube:play
                        (or (song-youtube-url *artist* *song*)
                            (concatenate 'string *artist* " " *song*)))
+                      (set-playing-song nil)
                       ;; Wait for this song to end before playing the next one.
                       )))
          :name "zbucium playing thread")))
@@ -80,8 +81,8 @@ stopped by the user. End the loop only when the player is stopped by the user."
 ;; that are passed to play-simple.
 (defun play-song (artist song)
   "Play and replay a single song"
-  (play-simple (make-generator ()
-                 (loop do (yield (list artist song))))))
+  (play-simple (make-generator (:final-value nil)
+                 (yield (list artist song)))))
 
 (defun play-artist (artist nsongs random)
   (play-simple (artist-songs artist nsongs random)))

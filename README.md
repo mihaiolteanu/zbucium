@@ -92,7 +92,7 @@ artists. The higher the values, the higher the chances to discover hidden gems.
 
 **play-song** _artist song_
 
-    Play a single song and then replay it after it finishes.
+    Play a single song and then quit.
 
 **play-artist** _artist nsongs random_
 
